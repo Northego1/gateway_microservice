@@ -1,0 +1,1 @@
+from api.auth.router import router as auth_router
