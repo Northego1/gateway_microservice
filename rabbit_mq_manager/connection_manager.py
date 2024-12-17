@@ -6,7 +6,7 @@ from aio_pika.abc import (
 from config import settings
 from exceptions.server_exceptions import ServerError
 from logger import service_logger as serv_log
-
+from config import settings
 
 
 
@@ -26,7 +26,8 @@ class RabbitMqManager:
             self.connection: AbstractRobustConnection = await connect_robust(
                 url=settings.rmq.rabbit_mq_dsn,
                 login=settings.rmq.RMQ_USER,
-                password=settings.rmq.RMQ_PASSWORD
+                password=settings.rmq.RMQ_PASSWORD,
+                port=settings.rmq.RMQ_PORT
             )
         except Exception as e:
             serv_log.error(f'Cant connect to RabbitMq. Error: {e}')

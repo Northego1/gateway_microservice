@@ -8,13 +8,13 @@ from aio_pika.abc import (
     AbstractExchange,
     AbstractQueue
 )
+from exceptions.server_exceptions import ServerError
 from rabbit_mq_manager.pool.abstract_pool import AbstractPool
-from rabbit_mq_manager.pool.channel_pool import producer_channel_pool
+from rabbit_mq_manager.pool.channel_pool import channel_pool
 from rabbit_mq_manager.pool.exchange_pool import exchange_pool
 from logger import (
     service_logger as serv_log,
 )
-from exceptions.server_exceptions import ServerError
 
 
 
@@ -22,7 +22,7 @@ class QueuePool(AbstractPool):
     def __init__(self: Self):
         self.queue_pool: dict[str, AbstractQueue] = {}
 
-        self.channel_pool = producer_channel_pool
+        self.channel_pool = channel_pool
         self.exchange_pool = exchange_pool
 
 
@@ -38,7 +38,7 @@ class QueuePool(AbstractPool):
             auto_delete: bool = False,
             arguments: Arguments = None,
             timeout: Optional[Union[int, float]] = None
-    ) -> None:
+    ) -> AbstractQueue:
         """Определяет queue."""
         if name in self.queue_pool:
             return self.queue_pool[name]

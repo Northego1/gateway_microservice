@@ -7,19 +7,18 @@ from aio_pika.abc import (
     AbstractChannel,
     AbstractExchange
 )
+from exceptions.server_exceptions import ServerError
 from rabbit_mq_manager.pool.abstract_pool import AbstractPool
-from rabbit_mq_manager.pool.channel_pool import producer_channel_pool
+from rabbit_mq_manager.pool.channel_pool import channel_pool
 from logger import (
     service_logger as serv_log,
 )
-from exceptions.server_exceptions import ServerError
-
 
 class ExchangePool(AbstractPool):
     def __init__(self: Self):
         self.exchange_pool: dict[str, AbstractExchange] = {}
 
-        self.channel_pool = producer_channel_pool
+        self.channel_pool = channel_pool
 
 
     async def add(
@@ -33,7 +32,7 @@ class ExchangePool(AbstractPool):
             passive: bool = False,
             arguments: Arguments = None,
             timeout: Optional[Union[int, float]] = None
-    ):
+    ) -> AbstractExchange:
         '''Определяет exchange'''
         if name in self.exchange_pool:
             return self.exchange_pool[name]
@@ -51,10 +50,10 @@ class ExchangePool(AbstractPool):
                 timeout=timeout, 
             )       
             self.exchange_pool[name] = exchange
+            serv_log.info(f'Exchange {name!r} success added to pool')
         except Exception as e:
             serv_log.error(f'Failed to add new exchange {name!r}')
             raise ServerError() from e
-        serv_log.info(f'Exchange {name!r} success added to pool')
         return exchange
 
 

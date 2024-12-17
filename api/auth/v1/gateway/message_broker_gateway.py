@@ -37,7 +37,7 @@ class MessageBrokerImpl:
         # Инициализация временной очереди, если требуется ответ
         reply_queue = None
         if reply:
-            channel: AbstractChannel = pool.producer_channel_pool.get_random_channel()
+            channel: AbstractChannel = pool.channel_pool.get('reply_channel')
             reply_queue = await producer.get_reply_queue(
                 channel=channel
             )

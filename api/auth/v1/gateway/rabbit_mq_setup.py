@@ -55,7 +55,8 @@ async def rabbit_mq_setup():
     serv_log.info('Starting microservice...')
     try:
         await connection_manager.connect()
-        await pool.producer_channel_pool.add('base_channel')
+        await pool.channel_pool.add('base_channel')
+        await pool.channel_pool.add('reply_channel')
         await pool.exchange_pool.add(
             name='DIRECT',
             type=ExchangeType.DIRECT,

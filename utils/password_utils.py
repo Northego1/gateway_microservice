@@ -5,7 +5,7 @@ def hash_password(
 ) -> bytes:
     return bcrypt.hashpw(
         password.encode(),
-        bcrypt.gensalt()
+        bcrypt.gensalt(rounds=10)
     )
 
 

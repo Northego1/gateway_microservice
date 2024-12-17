@@ -17,6 +17,7 @@ from schemas import (
 
 )
 from logger import message_logger as mes_log, active_id_var
+from utils.password_utils import hash_password
 
 
 class RegisterUseCaseProtocol(Protocol):
@@ -47,7 +48,7 @@ class RegisterUseCaseImpl:
             payload = ms_requests.MsRequestRegister(
                 username=self.user_register_schema.username,
                 email=self.user_register_schema.email,
-                hashed_password=self.user_register_schema.password.encode(),
+                hashed_password=hash_password(self.user_register_schema.password),
             )
             message = CustomMessage(body=payload, correlation_id=active_id)
             headers = {'X-Processing-Function': 'register'}

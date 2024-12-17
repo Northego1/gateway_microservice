@@ -5,6 +5,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
   rabbitmq-exporter:
     image: kbudde/rabbitmq-exporter
@@ -14,6 +19,9 @@ services:
       RABBIT_PASSWORD: guest
     ports:
       - "9419:9419"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy  # Ждём готовности RabbitMQ
 
   prometheus:
     container_name: prometheus
@@ -22,3 +30,20 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
+
+  gateway_ms:
+    build:
+      context: .
+    command: 
+      ["sh", "docker/app.sh"]
+    env_file:
+      - .env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy  # Ждём готовности RabbitMQ
+      rabbitmq-exporter:
+        condition: service_started
+      prometheus:
+        condition: service_started
+    ports:
+      - "4015:8000"
